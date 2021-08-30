@@ -40,12 +40,13 @@ router.post(
 );
 
 router.post("/login", async (req, res) => {
+  const { email, password } = req.body;
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const user = users.find((user) => user.email === req.body.email);
+  const user = users.find((user) => user.email === email);
   if (!user) {
     return res
       .status(400)
@@ -54,16 +55,16 @@ router.post("/login", async (req, res) => {
 
   const hashPassword = user.password;
 
-  const isMatch = await bcrypt.compare(req.body.password, hashPassword);
+  const isMatch = await bcrypt.compare(password, hashPassword);
 
   if (!isMatch) {
     return res.status(400).json({ errors: { msg: "Credential incorrect" } });
   }
 
-  const token = await JWT.sign({ email }, "SECRET_CODE", {
+  const token = await JWT.sign({ email }, "nfb32iur32ibfqfvi3vf932bg932g932", {
     expiresIn: 60 * 60,
   });
-  // res.header("token", token);
+  res.header("token", token);
   res.status(200).json({ msg: "Cool! you login successfully", token });
 });
 
